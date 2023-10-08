@@ -17,7 +17,7 @@ Each portion contains its own common area which can be leased or sold. There is 
 
 Development Project REVENUE Data:
 1. Commercial office building
-- Effective rental = HK$32psf for 3-year lease with growth rate @3% p.a. from year
+- Effective rental = HK$32psf for 3-year lease with growth rate @3% p.a. from year 1
 - Management fee = HK$6psf.
 - Utilities expenses directly incurred for management fee are approx. HK$2 million per annum.
 - The vacancy and collection loss rates: 15% in the first year, 10% in the second year and 5% in the subsequent years.

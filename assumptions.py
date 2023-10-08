@@ -8,16 +8,16 @@ import datetime
 class Info:
     duration: int  # years
     acq_cost: float
-    acq_date: datetime.datetime
-    area: float  # sqft
+    acq_date: datetime
+    area: float
+    exit_cap: float = 0  # Exit cap rate(%)
+    plot_ratio: float = 1
     area_ratio: Optional[
         dict
     ] = None  # % of total area, e.g. {"commercial": 0.7, "residential": 0.2, "retail": 0.1}
-    plot_ratio: float = 1
     wacc: Optional[float] = None  # Weighted average cost of capital(%)
-    exit_cap: float = 0  # Exit cap rate(%)
 
-    @property # project gfa calculation
+    @property  # project gfa calculation
     def project_gfa(self) -> float:
         return self.area * self.plot_ratio
 
@@ -32,35 +32,57 @@ class Stats:
     units: Optional[int] = None  # Number of units
 
 
+@dataclass
+class LeaseTerm:
+    building: Stats
+    lease_id: int  # eg. lease id 1 or 2 or 3
+    rental_price: float  # rental price per sqft
+    lease_term: int  # lease term(months)
+    rental_growth: float  # growth rate of rental price
+    growth_frequency: int  # step-up every x months
+    vacancy_rate: Optional[float]  # vacancy rate(%)
+
+
+@dataclass
+class Sale:
+    building: Stats
+    phase_id: int  # eg. phase id 1 or 2 or 3
+    sale_year: int  # year of sale
+    sale_price_sqft: float  # sale price per sqft
+    sale_growth: Optional[float] = None  # growth rate of sale price
+    percentage_sold: Optional[float] = None  # percentage of sqft sold (%)
+
+
 # Types of revenue
 @dataclass
 class Revenue:
     building: Stats
-    rental: Optional[float] = None  # rental income per sqft
-    lease_term: Optional[int] = None  # lease term(months)
-    sale: Optional[float] = None  # sale price per sqft
-    rental_growth: Optional[float] = None  # growth rate of rental and sale
     management_fee: Optional[float] = None  # management fee(%)
-    vacancy_rate: Optional[float] = None  # vacancy rate(%) or collection loss rate(%)
-
 
 
 # Types of cost
 @dataclass
 class Cost:
+    building: Stats
     construction_cost: float  # per sqft
     construction_time: float  # months
-    maintainance_cost: float  # % of gross revenue or otherwise indicated
-    marketing_cost: float  # % of gross revenue or otherwise indicated
-    disposition_cost: float  # % cost when exit
+    phase_id: Optional[int] = None  # eg. phase id 1 or 2 or 3
+    maintainance_cost: Optional[
+        float
+    ] = None  # % of gross revenue or otherwise indicated
+    marketing_cost: Optional[float] = None  # % of gross revenue or otherwise indicated
+    disposition_cost: Optional[float] = None  # % cost when exit
+    util_expense: Optional[float] = None  # utility expense per sqft
 
 
 # Deductables: Tax, Depreciation
 @dataclass
 class Deduction:
+    building: Stats
     vat: Optional[float] = None  # Value added tax(%) excl. land cost
-    deprecation: Optional[float] = None  # Depreciation rate(%)
+    depreciation: Optional[int] = None  # Depreciation years
     income_tax: Optional[float] = None  # Income tax rate(%)
+    tax_pay_on: Optional[int] = None  # Tax pay on year
 
 
 @dataclass
@@ -68,6 +90,6 @@ class Loan:
     ltv_ratio: float  # Loan to value ratio(%)
     annual_int_rate: float  # Annual interest rate(%)
     loan_period: int  # Loan period(months)
-    amortization_period: int  # Amortization period(months)
-    repayment_frequency: str  # Repayment frequency, "monthly" or "quarterly" or "semi-annually" or "annually"
-    interest_only: bool  # Bullet loan or not
+    repayment_frequency: int  # Repayment frequency, monthly = 1, quarterly = 3, semi-annually = 6, annually = 12
+    amortization_period: Optional[int] = None  # Amortization period(months)
+    loan_type: Optional[str] = None  # Bullet or Amortized
